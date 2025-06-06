@@ -18,6 +18,7 @@
             pkgs.rustfmt
             pkgs.clippy
             pkgs.rustc
+            pkgs.rust-analyzer
           ];
           shellHook = ''
             echo "Welcome to Rust on ${system}!"
