@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, vec};
 
 fn main() {
     fn first_element<T>(slice: &[T]) -> Option<&T> {
@@ -65,4 +65,72 @@ fn main() {
             self.field
         }
     }
+
+    struct DisplayStruct<T: Display> {
+        field: T,
+    }
+
+    enum HTTPResp<T> {
+        Success(T),
+        Error(T),
+    }
+
+    let resp1: HTTPResp<i32> = HTTPResp::Success(200);
+    let resp2: HTTPResp<&str> = HTTPResp::Success("OK");
+    let err1: HTTPResp<i32> = HTTPResp::Error(404);
+    let err2: HTTPResp<&str> = HTTPResp::Error("Not Found");
+
+    fn handle_response<T: Display>(response: HTTPResp<T>) {
+        match response {
+            HTTPResp::Success(value) => println!("Success: {}", value),
+            HTTPResp::Error(value) => println!("Error: {}", value),
+        }
+    }
+
+    handle_response(resp1);
+    handle_response(resp2);
+    handle_response(err1);
+    handle_response(err2);
+
+    trait Sorter<T> {
+        fn sort(&self, slice: &mut [T]);
+    }
+
+    struct SelectionSorter;
+
+    impl<T: PartialOrd> Sorter<T> for SelectionSorter {
+        fn sort(&self, slice: &mut [T]) {
+            for i in 0..slice.len() {
+                let mut min_index = i;
+                for j in i + 1..slice.len() {
+                    if slice[j] < slice[min_index] {
+                        min_index = j;
+                    }
+                }
+                slice.swap(i, min_index);
+            }
+        }
+    }
+
+    struct BubbleSorter;
+
+    impl<T: PartialOrd> Sorter<T> for BubbleSorter {
+        fn sort(&self, slice: &mut [T]) {
+            for i in 0..slice.len() {
+                for j in 0..slice.len() - 1 {
+                    if slice[j] > slice[j + 1] {
+                        slice.swap(j, j + 1);
+                    }
+                }
+            }
+        }
+    }
+
+    let mut numbers = vec![42, 1337, 28, 10];
+    let sorter = SelectionSorter;
+    sorter.sort(&mut numbers);
+
+    let mut words = vec!["cherry", "apple", "banana"];
+    let sorter = BubbleSorter;
+    sorter.sort(&mut words);
 }
